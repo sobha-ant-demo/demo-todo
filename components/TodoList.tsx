@@ -1,5 +1,6 @@
 "use client";
 
+import { AnimatePresence, motion } from "framer-motion";
 import { useMemo, useState } from "react";
 
 type Todo = {
@@ -75,28 +76,68 @@ export default function TodoList() {
       </form>
 
       <ul className="divide-y divide-slate-100">
-        {visible.map((t) => (
-          <li key={t.id} className="flex items-center gap-3 px-4 py-3">
-            <input
-              type="checkbox"
-              checked={t.done}
-              onChange={() => toggle(t.id)}
-              className="h-4 w-4"
-            />
-            <span
-              className={`flex-1 ${t.done ? "text-slate-400 line-through" : ""}`}
+        <AnimatePresence initial={false}>
+          {visible.map((t) => (
+            <motion.li
+              key={t.id}
+              layout
+              initial={{ opacity: 0, y: -8, height: 0 }}
+              animate={{ opacity: 1, y: 0, height: "auto" }}
+              exit={{ opacity: 0, x: -20, height: 0 }}
+              transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
+              className="flex items-center gap-3 overflow-hidden px-4 py-3"
             >
-              {t.title}
-            </span>
-            <button
-              onClick={() => remove(t.id)}
-              aria-label="Delete"
-              className="text-slate-400 hover:text-red-600"
-            >
-              ✕
-            </button>
-          </li>
-        ))}
+              <button
+                type="button"
+                role="checkbox"
+                aria-checked={t.done}
+                onClick={() => toggle(t.id)}
+                className={`relative flex h-5 w-5 flex-none items-center justify-center rounded-full border-2 transition-colors ${
+                  t.done
+                    ? "border-emerald-500 bg-emerald-500"
+                    : "border-slate-300 hover:border-slate-500"
+                }`}
+              >
+                <motion.svg
+                  viewBox="0 0 16 16"
+                  className="h-3 w-3 text-white"
+                  initial={false}
+                  animate={t.done ? "checked" : "unchecked"}
+                >
+                  <motion.path
+                    d="M3 8.5 L7 12 L13 5"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    variants={{
+                      checked: { pathLength: 1, opacity: 1 },
+                      unchecked: { pathLength: 0, opacity: 0 },
+                    }}
+                    transition={{ duration: 0.2, ease: "easeOut" }}
+                  />
+                </motion.svg>
+              </button>
+              <motion.span
+                animate={{
+                  opacity: t.done ? 0.45 : 1,
+                }}
+                transition={{ duration: 0.18 }}
+                className={`flex-1 ${t.done ? "line-through" : ""}`}
+              >
+                {t.title}
+              </motion.span>
+              <button
+                onClick={() => remove(t.id)}
+                aria-label="Delete"
+                className="text-slate-400 transition-colors hover:text-red-600"
+              >
+                ✕
+              </button>
+            </motion.li>
+          ))}
+        </AnimatePresence>
         {visible.length === 0 && (
           <li className="px-4 py-6 text-center text-sm text-slate-400">
             Nothing here.
