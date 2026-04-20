@@ -25,7 +25,7 @@ export default function TodoList() {
     return todos;
   }, [todos, filter]);
 
-  const remaining = todos.filter((t) => t.done).length;
+  const remaining = todos.filter((t) => !t.done).length;
 
   function addTodo() {
     const title = draft.trim();
